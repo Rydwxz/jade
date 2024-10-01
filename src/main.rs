@@ -99,7 +99,16 @@ impl Widget for &JadeApp {
 }
 
 impl JadeApp {
-    fn draw_dirbar(&self, area: Rect, buf: &mut Buffer) -> {
+    fn draw_dirbar(&self, area: Rect, buf: &mut Buffer) {
+
+    }
+    fn draw_filepane(&self, area: Rect, buf: &mut Buffer) {
+
+    }
+    fn draw_toolpane(&self, area: Rect, buf: &mut Buffer) {
+
+    }
+    fn draw_combar(&self, area: Rect, buf: &mut Buffer) {
 
     }
 }
