@@ -80,6 +80,26 @@ impl JadeApp {
 
 impl Widget for &JadeApp {
     fn render(self, area: Rect, buf: &mut Buffer) {
+        let [dir_bar,
+        file_pane,
+        tool_pane,
+        com_bar] = Layout::horizontal([
+            Constraint::Min(1),
+            Constraint::Percentage(60),
+            Constraint::Min(0),
+            Constraint::Min(1),
+        ]).areas(area);
+
+        Block::new().style(THEME.root).render(area, buf);
+        self.draw_dirbar(dir_bar, buf);
+        self.draw_filepane(file_pane, buf);
+        self.draw_toolpane(tool_pane, buf);
+        self.draw_combar(com_bar, buf);
+    }
+}
+
+impl JadeApp {
+    fn draw_dirbar(&self, area: Rect, buf: &mut Buffer) -> {
 
     }
 }
