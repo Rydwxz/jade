@@ -4,7 +4,9 @@ use std::{
 };
 use crossterm::event::{KeyCode, KeyEvent};
 use crossterm::terminal;
-use ratatui::{prelude::*, Terminal};
+use ratatui::{prelude::*,
+    Terminal,
+};
 use ratatui::crossterm::{
     execute,
     terminal::{
@@ -20,6 +22,7 @@ use ratatui::crossterm::{
 
 fn main() -> Result<(), io::Error> {
 
+    terminal::enable_raw_mode()?;
     let terminal = Terminal::new(CrosstermBackend::new(io::stderr())).expect("failed to connect to stderr");
     execute!(io::stderr(), EnterAlternateScreen).expect("failed to enter alternate screen");
     let mut jade = JadeApp::init()?;
