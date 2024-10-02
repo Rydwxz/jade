@@ -68,7 +68,7 @@ impl JadeApp {
 
     fn handle_key_press(&mut self, key: KeyEvent) {
         match key.code {
-            KeyCode::Esc => self.running = false,
+            KeyCode::Esc | KeyCode::Char('q') => self.running = false,
             _ => {},
         }
     }
