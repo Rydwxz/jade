@@ -90,7 +90,6 @@ impl Widget for &JadeApp {
             Constraint::Min(1),
         ]).areas(area);
 
-        Block::new().style(THEME.root).render(area, buf);
         self.draw_dirbar(dir_bar, buf);
         self.draw_filepane(file_pane, buf);
         self.draw_toolpane(tool_pane, buf);
