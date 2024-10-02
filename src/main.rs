@@ -1,4 +1,7 @@
-use std::io;
+use std::{
+    io,
+    path::PathBuf,
+};
 use crossterm::event::{KeyCode, KeyEvent};
 use crossterm::terminal;
 use ratatui::{prelude::*, Terminal};
@@ -14,7 +17,6 @@ use ratatui::crossterm::{
     },
 };
 
-mod file; use file::*;
 
 fn main() -> Result<(), io::Error> {
 
@@ -36,8 +38,7 @@ fn main() -> Result<(), io::Error> {
 
 struct JadeApp {
     running: bool,
-    files: Vec<File>,
-    cwd: std::path::PathBuf,
+    cwd: PathBuf,
 }
 impl JadeApp {
     fn init() -> io::Result<Self>  {
@@ -45,7 +46,6 @@ impl JadeApp {
 
         Ok(Self {
             running: true,
-            files: Vec::new(),
             cwd,
         })
     }
@@ -99,7 +99,11 @@ impl Widget for &JadeApp {
 
 impl JadeApp {
     fn draw_dirbar(&self, area: Rect, buf: &mut Buffer) {
-
+        let cwd = match self.cwd.to_str() {
+            Some(dir) => dir.to_string(),
+            None => "Windows paths not supported".to_string(),
+        };
+        Span::from(cwd).render(area, buf);
     }
     fn draw_filepane(&self, area: Rect, buf: &mut Buffer) {
 
