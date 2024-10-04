@@ -7,23 +7,21 @@ use ratatui::{
         ,
     },
     layout::{Constraint, Layout, Rect},
-    style::Color,
     text::{Line, Span},
-    widgets::{Block, Tabs, Widget, List, ListItem, ListState},
+    widgets::{Block, Tabs, Widget},
     Frame,
 };
 use std::{
     io,
-    path::PathBuf,
 };
 
 use crate::jade::jfs::*;
+use crate::jade::filepane::*;
 
 pub struct App {
     running: bool,
     cwd: Listing,
-    list: Vec<Listing>,
-    selection: usize,
+    file_pane: FilePane,
 }
 impl App {
     pub fn init() -> io::Result<Self>  {
@@ -31,9 +29,8 @@ impl App {
 
         Ok(Self {
             running: true,
-            list: list_dir(&cwd.path),
+            file_pane: FilePane::init(&cwd),
             cwd,
-            selection: 0,
         })
     }
 
@@ -56,6 +53,8 @@ impl App {
     pub fn handle_key_press(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Esc | KeyCode::Char('q') => self.running = false,
+            KeyCode::Char('j') => self.file_pane.move_cursor(SelMove::Down(1)),
+            KeyCode::Char('k') => self.file_pane.move_cursor(SelMove::Up(1)),
             _ => {},
         }
     }
@@ -78,33 +77,14 @@ impl Widget for &App {
         ]).areas(area);
 
         self.draw_dirbar(dir_bar, buf);
-        self.draw_filepane(file_pane, buf);
-        self.draw_toolpane(tool_pane, buf);
-        self.draw_combar(com_bar, buf);
+        self.file_pane.render(file_pane, buf);
+        // self.draw_toolpane(tool_pane, buf);
+        // self.draw_combar(com_bar, buf);
     }
 }
 
 impl App {
     fn draw_dirbar(&self, area: Rect, buf: &mut Buffer) {
         Span::from(&self.cwd.name).render(area, buf);
-    }
-    fn draw_filepane(&self, area: Rect, buf: &mut Buffer) {
-        StatefulWidget::render(
-            List::new(
-                self.list.iter().map(
-                    |e| { ListItem::new(Span::from(&e.name)) }
-                )
-            ).highlight_style(Style::new().bg(Color::Rgb(255, 0, 0))),
-            area,
-            buf,
-            &mut ListState::default()
-            .with_selected(Some(self.selection))
-        );
-    }
-    fn draw_toolpane(&self, area: Rect, buf: &mut Buffer) {
-
-    }
-    fn draw_combar(&self, area: Rect, buf: &mut Buffer) {
-
     }
 }
