@@ -58,7 +58,13 @@ impl DirItem {
     pub fn new(path: PathBuf, uname: &str) -> Self {
         let full_string = path.display().to_string();
         let prefix = get_prefix(&full_string, &uname);
-        let name = format!("{:?}", path.file_name());
+        let name = match path.file_name() {
+            Some(name) => match name.to_string_lossy() {
+                Ok(s) => s,
+                Err(os) => " ".to_string(),
+            },
+            None => "/",
+        };
 
         Self {
             class: EntryType::Dir,
@@ -85,10 +91,12 @@ fn in_home(strpath: &str, uname: &str) -> bool {
 }
 
 fn get_subpath(strpath: &str, prefix: &str, name: &str, uname: &str) -> String {
-    if in_home(strpath, uname) {
-        format!("~/{}{}")
-    } else {
-
+    let prefix_len = 4 + uname.len();
+    let postfix_len = strpath.len() - uname.len();
+    match prefix.len() {
+        1 => strpath[1..postfix_len].to_string(),
+        2 => strpath[prefix_len .. postfix_len].to_string(),
+        _ => "unreachable code reached".to_string(),
     }
 }
 
