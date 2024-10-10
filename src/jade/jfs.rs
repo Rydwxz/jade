@@ -63,7 +63,7 @@ impl DirItem {
         Self {
             class: EntryType::Dir,
             path,
-            sub_path: get_subpath(&full_string, &prefix, &name),
+            sub_path: get_subpath(&full_string, &prefix, &name, uname),
             name,
             prefix,
             full_string,
@@ -73,33 +73,37 @@ impl DirItem {
 
 
 fn get_prefix(strpath: &str, uname: &str) -> String {
-    if is_home(strpath, uname) {
+    if in_home(strpath, uname) {
         "~/".to_string()
     } else {
         "/".to_string()
     }
 }
 
-fn is_home(strpath: &str, uname: &str) -> bool {
+fn in_home(strpath: &str, uname: &str) -> bool {
     strpath.starts_with(&format!("/home/{}/", uname))
 }
 
-fn get_subpath(strpath: &str, prefix: &str, name: &str) -> String {
-    strpath[prefix.len()..strpath.len() - name.len()].to_string()
+fn get_subpath(strpath: &str, prefix: &str, name: &str, uname: &str) -> String {
+    if in_home(strpath, uname) {
+        format!("~/{}{}")
+    } else {
+
+    }
 }
 
 #[test]
 fn test_get_subpath() {
     assert_eq!(
         "doc/ref/",
-        get_subpath("/home/rw/doc/ref/.index", "~/", ".index"),
+        get_subpath("/home/rw/doc/ref/.index", "~/", ".index", "rw"),
     );
     assert_eq!(
         "etc/lvm/",
-        get_subpath("/etc/lvm/lvm.conf", "/", "lvm.conf"),
+        get_subpath("/etc/lvm/lvm.conf", "/", "lvm.conf", "rw"),
     );
     assert_eq!(
         "home/redward/cs/rust/",
-        get_subpath("home/redward/cs/rust/book", "/", "book"),
+        get_subpath("home/redward/cs/rust/book", "/", "book", "rw"),
     );
 }
