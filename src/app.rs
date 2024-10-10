@@ -17,19 +17,28 @@ use std::{
 
 use crate::jade::jfs::*;
 use crate::jade::filepane::*;
+use crate::jade::dirbar::*;
 
 pub struct App {
     running: bool,
-    cwd: Listing,
+    cwd: DirItem,
+    dir_bar: DirBar,
     file_pane: FilePane,
+    uname: String,
 }
 impl App {
     pub fn init() -> io::Result<Self>  {
-        let cwd = Listing::new(std::env::current_dir()?);
+        let uname = match std::env::var("USER") {
+            Ok(uname) => uname,
+            Err(_) => "notauserdon'tmatchthisthere'snouserhere".to_string(),
+        };
+        let cwd = DirItem::new(std::env::current_dir()?, &uname);
 
-        Ok(Self {
+        Ok( Self {
             running: true,
-            file_pane: FilePane::init(&cwd),
+            dir_bar: DirBar::init(&cwd),
+            file_pane: FilePane::init(&cwd.path, &uname),
+            uname,
             cwd,
         })
     }
@@ -52,9 +61,9 @@ impl App {
 
     pub fn handle_key_press(&mut self, key: KeyEvent) {
         match key.code {
-            KeyCode::Esc | KeyCode::Char('q') => self.running = false,
-            KeyCode::Char('j') => self.file_pane.move_cursor(SelMove::Down(1)),
-            KeyCode::Char('k') => self.file_pane.move_cursor(SelMove::Up(1)),
+            KeyCode::Char('q') | KeyCode::Esc => self.running = false,
+            KeyCode::Char('j') | KeyCode::Down => self.file_pane.move_selector(SelMove::Down(1)),
+            KeyCode::Char('k') | KeyCode::Up => self.file_pane.move_selector(SelMove::Up(1)),
             _ => {},
         }
     }
@@ -76,15 +85,9 @@ impl Widget for &App {
             Constraint::Min(1),
         ]).areas(area);
 
-        self.draw_dirbar(dir_bar, buf);
+        self.dir_bar.render(dir_bar, buf);
         self.file_pane.render(file_pane, buf);
         // self.draw_toolpane(tool_pane, buf);
         // self.draw_combar(com_bar, buf);
-    }
-}
-
-impl App {
-    fn draw_dirbar(&self, area: Rect, buf: &mut Buffer) {
-        Span::from(&self.cwd.name).render(area, buf);
     }
 }

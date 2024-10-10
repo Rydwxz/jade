@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use ratatui::{
     widgets::{Widget, StatefulWidget, List, ListItem, ListState},
     style::{Style, Color},
@@ -7,14 +8,14 @@ use crate::jade::jfs::*;
 
 pub struct FilePane {
     sel: usize,
-    list: Vec<Listing>,
+    list: DirList,
 }
 
 impl Widget for &FilePane {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer) {
         StatefulWidget::render(
             List::new(
-                self.list.iter().map(
+                self.list.items.iter().map(
                     |e| { ListItem::new(Span::from(&e.name)) }
                 )
             ).highlight_style(Style::new().bg(Color::Rgb(255, 0, 0))),
@@ -27,13 +28,14 @@ impl Widget for &FilePane {
 }
 
 impl FilePane {
-    pub fn init(cwd: &Listing) -> Self {
+    pub fn init(cwd: &PathBuf, uname: &str) -> Self {
         Self {
             sel: 0,
-            list: list_dir(&cwd.path),
+            list: DirList::new(cwd.to_path_buf(), uname),
         }
     }
-    pub fn move_cursor(&mut self, n: SelMove) {
+
+    pub fn move_selector(&mut self, n: SelMove) {
         match n {
             SelMove::Up(n) => match n < self.sel {
                 true => self.sel -= n,
