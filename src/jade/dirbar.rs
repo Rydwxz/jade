@@ -3,6 +3,7 @@ use ratatui::{
     widgets::{
         Widget,
         Block,
+        Paragraph,
     },
 };
 
@@ -14,12 +15,13 @@ pub struct DirBar {
 
 impl Widget for &DirBar {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        Block::bordered().render(area, buf);
-        Line::from(vec![
+        Paragraph::new(Line::from_iter(vec![
             Span::raw(&self.cwd.prefix),
             Span::raw(&self.cwd.sub_path),
             Span::raw(&self.cwd.name),
-        ]).render(area, buf);
+        ]))
+        .block(Block::bordered())
+        .render(area, buf);
     }
 }
 

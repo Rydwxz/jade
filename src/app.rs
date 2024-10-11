@@ -79,7 +79,7 @@ impl Widget for &App {
         file_pane,
         tool_pane,
         com_bar] = Layout::vertical([
-            Constraint::Max(1),
+            Constraint::Max(3),
             Constraint::Percentage(60),
             Constraint::Min(0),
             Constraint::Min(1),
