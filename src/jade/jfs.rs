@@ -59,11 +59,8 @@ impl DirItem {
         let full_string = path.display().to_string();
         let prefix = get_prefix(&full_string, &uname);
         let name = match path.file_name() {
-            Some(name) => match name.to_string_lossy() {
-                Ok(s) => s,
-                Err(os) => " ".to_string(),
-            },
-            None => "/",
+            Some(name) => name.to_string_lossy().to_string(),
+            None => "/".to_string(),
         };
 
         Self {
