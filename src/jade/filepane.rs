@@ -6,12 +6,12 @@ use ratatui::{
 };
 use crate::jade::jfs::*;
 
-pub struct FilePane {
+pub struct ListView {
     sel: usize,
     list: DirList,
 }
 
-impl Widget for &FilePane {
+impl Widget for &ListView {
     fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer) {
         StatefulWidget::render(
             List::new(
@@ -27,7 +27,7 @@ impl Widget for &FilePane {
     }
 }
 
-impl FilePane {
+impl ListView {
     pub fn init(cwd: &PathBuf, uname: &str) -> Self {
         Self {
             sel: 0,
