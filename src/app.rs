@@ -12,16 +12,13 @@ use ratatui::{
 };
 use std::io;
 
-use crate::jade::dirbar::*;
-use crate::jade::filepane::*;
-use crate::jade::jfs::*;
+use crate::jade::fs::*;
+use crate::ui::{input_view::*, list_view::*};
 
 pub struct App {
     continue_running: bool,
-    mode: AppMode,
-    input_buffer: String,
     cwd: DirItem,
-    statusline: Statusline,
+    input_view: InputView,
     list_view: ListView,
     uname: String,
 }
@@ -35,10 +32,10 @@ impl App {
 
         Ok(Self {
             continue_running: true,
-            statusline: Statusline::init(),
+            input_view: InputView::init(),
             list_view: ListView::init(&cwd.path, &uname),
-            uname,
             cwd,
+            uname,
         })
     }
 
@@ -60,9 +57,10 @@ impl App {
 
     pub fn handle_key_press(&mut self, key: KeyEvent) {
         match key.code {
-            KeyCode::Char('q') | KeyCode::Esc => self.continue_running = false,
-            KeyCode::Char('j') | KeyCode::Down => self.list_view.move_selector(SelMove::Down(1)),
-            KeyCode::Char('k') | KeyCode::Up => self.list_view.move_selector(SelMove::Up(1)),
+            KeyCode::Esc => self.continue_running = false,
+            KeyCode::Down => self.list_view.jog_selector(1),
+            KeyCode::Up => self.list_view.jog_selector(-1),
+            KeyCode::Char(c) => self.input_view.new_input(c),
             _ => {}
         }
     }
@@ -74,18 +72,11 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let [dir_bar, file_pane, tool_pane, com_bar] = Layout::vertical([
-            Constraint::Max(3),
-            Constraint::Percentage(60),
-            Constraint::Min(0),
-            Constraint::Min(1),
-        ])
-        .areas(area);
+        let [list_view, input_view] =
+            Layout::vertical([Constraint::Ratio(1, 1), Constraint::Min(2)]).areas(area);
 
-        self.statusline.render(dir_bar, buf);
-        self.list_view.render(file_pane, buf);
-        // self.draw_toolpane(tool_pane, buf);
-        // self.draw_combar(com_bar, buf);
+        self.list_view.render(list_view, buf);
+        self.input_view.render(input_view, buf);
     }
 }
 

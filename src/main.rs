@@ -1,23 +1,20 @@
-use std::io;
 use crossterm::terminal;
-use ratatui::{prelude::*,
-    Terminal,
-};
 use ratatui::crossterm::{
     execute,
-    terminal::{
-        EnterAlternateScreen,
-        LeaveAlternateScreen,
-    },
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen},
 };
+use ratatui::{prelude::*, Terminal};
+use std::io;
 
-mod app; use app::*;
+mod app;
+use app::*;
 mod jade;
+mod ui;
 
 fn main() -> Result<(), io::Error> {
-
     terminal::enable_raw_mode()?;
-    let terminal = Terminal::new(CrosstermBackend::new(io::stderr())).expect("failed to connect to stderr");
+    let terminal =
+        Terminal::new(CrosstermBackend::new(io::stderr())).expect("failed to connect to stderr");
     execute!(io::stderr(), EnterAlternateScreen).expect("failed to enter alternate screen");
     let mut jade = App::init()?;
 

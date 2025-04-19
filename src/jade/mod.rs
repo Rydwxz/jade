@@ -1,3 +1,2 @@
-pub mod jfs;
-pub mod filepane;
-pub mod dirbar;
+pub mod fs;
+pub mod parse;
